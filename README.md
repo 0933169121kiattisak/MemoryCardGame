@@ -40,3 +40,21 @@
           // Hide unmatched pairs
       }
    ```
+4. Game Flow:
+   ```
+      Start Game
+       ↓
+      Initialize Board
+          ↓
+      Wait for Player Click
+          ↓
+      Flip First Card
+          ↓
+      Wait for Second Card
+          ↓
+      Check for Match
+          ↓
+      Update Score/State
+          ↓
+      Continue or Win
+   ```
