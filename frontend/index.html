@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Card Game</title>
+    <link rel="stylesheet" href="output.css">
+</head>
+<body class="min-h-screen bg-gray-100 flex flex-col items-center p-6 font-sans">
+    <div class="max-w-2xl w-full">
+        <!-- Game Stats -->
+        <div class="flex justify-between mb-6 text-xl">
+            <div>Moves: <span id="moves" class="font-bold">0</span></div>
+            <div>Matches: <span id="matches" class="font-bold">0</span></div>
+        </div>
+
+        <!-- Game Grid -->
+        <div id="gameGrid" class="grid grid-cols-4 gap-4"></div>
+
+        <!-- Reset Button -->
+        <button onclick="resetGame()" 
+                class="mt-6 px-6 py-3 bg-green-500 text-white rounded-lg text-lg font-semibold 
+                       hover:bg-green-600 transition-colors duration-300 w-full">
+            New Game
+        </button>
+    </div>
+
+    <script>
+        const emojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'];
+        let cards = [];
+        let flippedCards = [];
+        let moves = 0;
+        let matches = 0;
+        let canFlip = true;
+
+        function createCard(emoji) {
+            const card = document.createElement('div');
+            // Store isFlipped in the card's data attributes
+            card.dataset.isFlipped = 'false';
+            card.dataset.emoji = emoji;
+            card.className = 'aspect-[3/4] bg-blue-500 rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-105 flex items-center justify-center text-4xl';
+            card.addEventListener('click', handleCardClick);
+            return card;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function handleCardClick() {
+            if (!canFlip || this.dataset.isFlipped === 'true' || flippedCards.length >= 2) return;
+
+            flipCard(this);
+        }
+
+        function flipCard(card) {
+            card.dataset.isFlipped = 'true';
+            card.classList.remove('bg-blue-500');
+            card.classList.add('bg-white');
+            card.textContent = card.dataset.emoji;
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                moves++;
+                document.getElementById('moves').textContent = moves;
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            canFlip = false;
+
+            if (card1.dataset.emoji === card2.dataset.emoji) {
+                matches++;
+                document.getElementById('matches').textContent = matches;
+                flippedCards = [];
+                canFlip = true;
+
+                if (matches === emojis.length) {
+                    setTimeout(() => alert('Congratulations! You won! 🎉'), 500);
+                }
+            } else {
+                setTimeout(() => {
+                    // Unflip the cards
+                    card1.dataset.isFlipped = 'false';
+                    card2.dataset.isFlipped = 'false';
+                    card1.classList.remove('bg-white');
+                    card2.classList.remove('bg-white');
+                    card1.classList.add('bg-blue-500');
+                    card2.classList.add('bg-blue-500');
+                    card1.textContent = '';
+                    card2.textContent = '';
+                    flippedCards = [];
+                    canFlip = true;
+                }, 1000);
+            }
+        }
+
+        function resetGame() {
+            const gameGrid = document.getElementById('gameGrid');
+            gameGrid.innerHTML = '';
+            moves = 0;
+            matches = 0;
+            flippedCards = [];
+            canFlip = true;
+            document.getElementById('moves').textContent = moves;
+            document.getElementById('matches').textContent = matches;
+            
+            // Create pairs of cards
+            cards = [...emojis, ...emojis];
+            cards = shuffleArray(cards);
+            
+            cards.forEach(emoji => {
+                gameGrid.appendChild(createCard(emoji));
+            });
+        }
+
+        // Initialize the game
+        resetGame();
+    </script>
+</body>
+</html>
